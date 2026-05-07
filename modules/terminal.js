@@ -88,6 +88,16 @@ export class Terminal {
                 return;
             }
 
+            if (lowerCmd.startsWith('physics simulate')) {
+                // syntax: physics simulate <force> <mass>
+                const parts = command.split(/\s+/).slice(2);
+                const f = Number(parts[1] || parts[0]);
+                const m = Number(parts[2] || parts[1] || parts[0]);
+                const res = this.physics.simulateFromArgs(f, m);
+                this.writeLog(`[PHYSICS]: ${JSON.stringify(res)}`, 'cyan');
+                return;
+            }
+
             if (lowerCmd.startsWith('ai ')) {
                 const q = command.slice(3).trim();
                 if (typeof window.aiQuery === 'function') {

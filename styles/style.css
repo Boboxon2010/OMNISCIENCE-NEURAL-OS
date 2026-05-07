@@ -352,3 +352,8 @@ input#terminalInput {
     .lab-container, .phys-grid { grid-template-columns: 1fr; }
     body { overflow: auto; }
 }
+
+.tube-palette { display:flex; flex-direction:column; align-items:center; }
+.tube-palette svg { filter: drop-shadow(0 6px 18px rgba(2,6,23,0.6)); }
+#elementSwatches div { transition: transform .12s ease; }
+#elementSwatches div:hover { transform: translateY(-3px); box-shadow: 0 6px 18px rgba(0,0,0,0.5); }

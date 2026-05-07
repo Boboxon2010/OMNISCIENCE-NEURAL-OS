@@ -16,7 +16,36 @@ export class ChemistryEngine {
     initialize() {
         this.populateSelectors();
         this.setupEventListeners();
+        this.populateSwatches();
         console.log("[ChemistryEngine]: Ready and Neural Linked.");
+    }
+
+    populateSwatches() {
+        try {
+            const sw = document.getElementById('elementSwatches');
+            const sel1 = document.getElementById('element1');
+            const sel2 = document.getElementById('element2');
+            if (!sw) return;
+            sw.innerHTML = '';
+            const toShow = this.elements.slice(0, 24);
+            toShow.forEach((el, idx) => {
+                const d = document.createElement('div');
+                d.title = `${el.symbol} - ${el.name}`;
+                d.style.width = '20px'; d.style.height = '20px'; d.style.borderRadius = '4px';
+                d.style.background = el.color || '#00f2ff';
+                d.style.border = '1px solid rgba(255,255,255,0.06)';
+                d.style.cursor = 'pointer';
+                d.addEventListener('click', () => {
+                    // toggle set: if element1 not set or last clicked 1->2 toggle
+                    if (sel1 && sel1.value === el.symbol) {
+                        if (sel2) sel2.value = el.symbol;
+                    } else {
+                        if (sel1) sel1.value = el.symbol;
+                    }
+                });
+                sw.appendChild(d);
+            });
+        } catch (e) { console.warn('Swatches failed', e); }
     }
 
     setupEventListeners() {
