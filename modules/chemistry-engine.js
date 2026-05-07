@@ -54,12 +54,14 @@ export class ChemistryEngine {
      * Reaksiyani Gemini orqali tahlil qilish (Dynamic Interaction)
      */
     async mix() {
-        const e1 = document.getElementById('element1').value;
-        const e2 = document.getElementById('element2').value;
+        const el1 = document.getElementById('element1');
+        const el2 = document.getElementById('element2');
+        const e1 = el1 ? el1.value : null;
+        const e2 = el2 ? el2.value : null;
         const resultDiv = document.getElementById('reactionResult');
         const liquid = document.getElementById('liquid');
 
-        this.updateAIStatus(`Analyzing reaction: ${e1} + ${e2}...`);
+        this.updateAIStatus(`Analyzing reaction: ${e1 || 'unknown'} + ${e2 || 'unknown'}...`);
 
         // Vizual aralashtirish animatsiyasi
         gsap.to(liquid, { 
@@ -88,7 +90,11 @@ export class ChemistryEngine {
                 this.triggerExplosion(e1, e2);
             }
             
-            this.storage.save('expCount', (this.storage.get('expCount') || 0) + 1);
+            // StorageManager uses load/save
+            const prev = this.storage.load('expCount') || 0;
+            this.storage.save('expCount', prev + 1);
+            // Play mix sound if available
+            try { if (window.OS && window.OS.audio) window.OS.audio.play('mix', { volume: 0.6 }); } catch {}
         } catch (err) {
             resultDiv.innerHTML = `<p>Reaksiya noaniq. Tizim xatosi: ${err.message}</p>`;
         }
@@ -117,6 +123,7 @@ export class ChemistryEngine {
         gsap.fromTo('.workspace', { x: -10 }, { x: 10, duration: 0.05, repeat: 10, yoyo: true });
         
         this.updateAIStatus("CRITICAL: Exothermic Reaction Detected!");
+        try { if (window.OS && window.OS.audio) window.OS.audio.play('explosion', { volume: 0.9 }); } catch {}
     }
 
     heat() {

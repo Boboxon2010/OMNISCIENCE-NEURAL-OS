@@ -9,18 +9,22 @@ import { MathEngine } from '../modules/math-engine.js';
 import { PhysicsEngine } from '../modules/physics-engine.js';
 import { Terminal } from '../modules/terminal.js';
 import { StorageManager } from '../modules/storage.js';
+import { AudioManager } from '../modules/audio.js';
+import { ParticleSystem } from '../modules/particles.js';
 
 class NeuralOS {
     constructor() {
         this.apiKey = "AIzaSyCoDRhZ60BSzaYRsmSer5MibZjvgVnOzyc";
         
         // Modullarni yaratish
-        this.storage = new StorageManager();
+    this.storage = new StorageManager();
         this.chemistry = new ChemistryEngine(this.storage);
         this.mathEngine = new MathEngine(this.storage);
         this.physics = new PhysicsEngine();
         this.terminal = new Terminal(this.mathEngine, this.chemistry, this.physics, this.storage);
         this.ui = new UIManager();
+    this.audio = new AudioManager();
+    this.particles = new ParticleSystem();
 
         // AI-ga kodni o'zgartirishga ruxsat berish
         this.allowSelfRewrite = true; 
@@ -32,10 +36,23 @@ class NeuralOS {
         try {
             console.log("%c[OmniScience] System Booting...", "color: #00f2ff; font-weight: bold;");
             
-            await this.chemistry.initialize();
-            await this.mathEngine.initialize();
-            await this.physics.initialize();
+            // initialize functions may be synchronous; call without await when not returning promises
+            if (typeof this.chemistry.initialize === 'function') this.chemistry.initialize();
+            if (typeof this.mathEngine.initialize === 'function') this.mathEngine.initialize();
+            if (typeof this.physics.initialize === 'function') this.physics.initialize();
             this.terminal.initialize();
+
+            // Start particle background
+            try { this.particles.start(); } catch (e) { console.warn('Particles failed:', e); }
+
+            // Load audio assets (non-blocking)
+            try {
+                this.audio.loadAll([
+                    ['mix', 'assets/sounds/mix.mp3'],
+                    ['explosion', 'assets/sounds/explosion.mp3'],
+                    ['click', 'assets/sounds/click.mp3']
+                ]);
+            } catch (e) { console.warn('Audio init failed:', e); }
 
             this.setupGlobalAI();
             this.startHealthCheck();
