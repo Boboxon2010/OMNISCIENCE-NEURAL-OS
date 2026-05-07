@@ -91,13 +91,30 @@ export class ChemistryEngine {
             }
             
             // StorageManager uses load/save
-            const prev = this.storage.load('expCount') || 0;
-            this.storage.save('expCount', prev + 1);
+            const prev = (this.storage && typeof this.storage.load === 'function') ? (this.storage.load('expCount') || 0) : 0;
+            if (this.storage && typeof this.storage.save === 'function') this.storage.save('expCount', prev + 1);
+            // Update dashboard counter if present
+            const expEl = document.getElementById('expCount');
+            if (expEl) expEl.textContent = String(prev + 1);
             // Play mix sound if available
             try { if (window.OS && window.OS.audio) window.OS.audio.play('mix', { volume: 0.6 }); } catch {}
         } catch (err) {
             resultDiv.innerHTML = `<p>Reaksiya noaniq. Tizim xatosi: ${err.message}</p>`;
         }
+    }
+
+    /**
+     * Programmatic mix invocation (used by terminal or AI). Accepts symbols or names.
+     */
+    async mixFromArgs(a, b) {
+        // try to set selectors if present
+        const s1 = document.getElementById('element1');
+        const s2 = document.getElementById('element2');
+        if (s1) s1.value = a;
+        if (s2) s2.value = b;
+        // call standard mix
+        await this.mix();
+        return { ok: true, message: `Mix triggered: ${a} + ${b}` };
     }
 
     triggerExplosion(e1, e2) {
