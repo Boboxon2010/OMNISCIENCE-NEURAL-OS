@@ -1,6 +1,6 @@
 /**
- * OMNISCIENCE NEURAL OS - CORE ENGINE
- * Integrated with Gemini 1.5 Pro AI Controller
+ * OMNISCIENCE NEURAL OS - SELF-EVOLVING CORE
+ * Gemini 1.5 Pro AI Controller bilan to'liq integratsiya
  */
 
 import { UIManager } from '../modules/ui.js';
@@ -12,11 +12,9 @@ import { StorageManager } from '../modules/storage.js';
 
 class NeuralOS {
     constructor() {
-        // API Configuration
         this.apiKey = "AIzaSyCoDRhZ60BSzaYRsmSer5MibZjvgVnOzyc";
-        this.aiStatus = document.getElementById('ai-activity');
         
-        // Modules Initialization
+        // Modullarni yaratish
         this.storage = new StorageManager();
         this.chemistry = new ChemistryEngine(this.storage);
         this.mathEngine = new MathEngine(this.storage);
@@ -24,99 +22,117 @@ class NeuralOS {
         this.terminal = new Terminal(this.mathEngine, this.chemistry, this.physics, this.storage);
         this.ui = new UIManager();
 
+        // AI-ga kodni o'zgartirishga ruxsat berish
+        this.allowSelfRewrite = true; 
+        
         this.init();
     }
 
     async init() {
         try {
-            console.log("%c[OmniScience] Booting Neural System...", "color: #00f2ff; font-weight: bold;");
+            console.log("%c[OmniScience] System Booting...", "color: #00f2ff; font-weight: bold;");
             
-            // Initialize All Engines
             await this.chemistry.initialize();
             await this.mathEngine.initialize();
             await this.physics.initialize();
             this.terminal.initialize();
 
-            this.setupDiagnostics();
-            this.connectToGemini();
-            
-            console.log("%c[OmniScience] System Online. Gemini Controller Active.", "color: #39ff14;");
+            this.setupGlobalAI();
+            this.startHealthCheck();
+
         } catch (error) {
-            this.handleSystemError(error);
+            this.repairSystem(error, "initialization");
         }
     }
 
     /**
-     * Gemini API bilan bog'lanish va terminal buyruqlarini AI orqali boshqarish
+     * Gemini-ni tizim "superuser"i sifatida sozlash
      */
-    async connectToGemini() {
-        this.aiStatus.textContent = "AI Connected: Gemini 1.5 Pro";
-        this.aiStatus.classList.add('pulse');
-        
-        // Global AI Controller - bu funksiya terminal orqali kelgan savollarni tahlil qiladi
+    setupGlobalAI() {
         window.aiQuery = async (prompt) => {
+            const systemContext = `
+                Siz OmniScience OS-ning yadrosiz. Sizga JavaScript kodini tiriklayin O'ZGARTIRISH ruxsati berildi.
+                Agar foydalanuvchi xato haqida yozsa yoki tizim xato bersa, javobingizda faqat tushuntirish emas, 
+                balki maxsus formatda tuzatishni yuboring:
+                ||FIX_CODE||: [obyekt_nomi].[funksiya_nomi] = [yangi_funksiya_kodi]
+            `;
+
             try {
                 const response = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${this.apiKey}`, {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify({
-                        contents: [{ parts: [{ text: `Sen OmniScience OS boshqaruvchisisan. Foydalanuvchiga ilmiy yordam ber. Buyruq: ${prompt}` }] }]
+                        contents: [{ parts: [{ text: systemContext + prompt }] }]
                     })
                 });
                 const data = await response.json();
-                return data.candidates[0].content.parts[0].text;
+                const aiText = data.candidates[0].content.parts[0].text;
+
+                // Agar javobda FIX_CODE bo'lsa, uni bajarish
+                if (aiText.includes("||FIX_CODE||")) {
+                    this.applyLivePatch(aiText);
+                }
+
+                return aiText;
             } catch (err) {
-                this.handleSystemError(err);
-                return "AI bilan aloqa uzildi. Self-healing ishga tushmoqda...";
+                console.error("AI Aloqa xatosi:", err);
+                return "Neural link offline.";
             }
         };
     }
 
     /**
-     * Tizim xatolarini Gemini orqali avtomatik tuzatish (Self-Healing)
+     * KODNI TIRIKLAYIN O'ZGARTIRISH (The Core Magic)
      */
-    async handleSystemError(error) {
-        console.error("AI Detects Error:", error);
-        document.getElementById('ai-repair-overlay').classList.remove('hidden');
-        this.aiStatus.textContent = "REPAIRING...";
-
-        // Gemini'ga xato haqida xabar yuborish
-        const repairPrompt = `System error detected: ${error.message}. Provide a logic fix for this JavaScript environment.`;
-        
+    applyLivePatch(patchCommand) {
         try {
-            const fix = await window.aiQuery(repairPrompt);
-            console.log("%c[AI FIX]: " + fix, "color: orange;");
+            const codePart = patchCommand.split("||FIX_CODE||:")[1].trim();
             
-            // Log xatoni saqlash
-            this.storage.save('system_logs', { error: error.message, time: new Date() });
+            // Masalan: "this.chemistry.mix = function() { ... }"
+            // Biz buni 'this' kontekstida eval qilamiz
+            const rewriteLogic = new Function('os', `return os.${codePart}`);
+            rewriteLogic(this);
+
+            console.log("%c[AI REPAIR]: Kod muvaffaqiyatli yangilandi!", "color: #39ff14; font-weight: bold;");
+            this.terminal.writeLog("[SYS]: AI tizim kodiga o'zgartirish kiritdi. Tuzatish muvaffaqiyatli.", "green");
             
-            setTimeout(() => {
-                document.getElementById('ai-repair-overlay').classList.add('hidden');
-                this.aiStatus.textContent = "System Restored";
-            }, 3000);
-        } catch (e) {
-            console.log("Critical Failure. Local backup required.");
+            // Vizual bildirishnoma
+            this.ui.updateAIActivity("System Self-Healed.");
+        } catch (err) {
+            console.error("AI tuzatish kiritishda xato qildi:", err);
         }
     }
 
     /**
-     * Real-vaqt diagnostikasi
+     * Tizimni avtomatik diagnostika qilish
      */
-    setupDiagnostics() {
+    async repairSystem(error, source) {
+        console.warn(`[DIAGNOSTICS]: Xato aniqlandi (${source}):`, error.message);
+        
+        this.ui.showRepairOverlay(true);
+        this.ui.updateAIActivity("AI is rewriting corrupted logic...");
+
+        const repairPrompt = `Tizimda xato chiqdi: "${error.message}". Manba: ${source}. 
+        Iltimos, ushbu funksiyani tuzatish uchun ||FIX_CODE|| formatida JS kodini yubor.`;
+
+        await window.aiQuery(repairPrompt);
+
+        setTimeout(() => {
+            this.ui.showRepairOverlay(false);
+            this.ui.updateAIActivity("System Stabilized.");
+        }, 2000);
+    }
+
+    startHealthCheck() {
+        // CPU va Memory simulyatsiyasi (Dashboard uchun)
         setInterval(() => {
-            const cpu = Math.floor(Math.random() * 15) + 2; // Realistik yuklama
-            const mem = Math.floor(Math.random() * 50) + 120;
-            
-            document.getElementById('cpuUsage').textContent = cpu + '%';
-            document.getElementById('memoryUsage').textContent = mem + ' MB';
-            
-            // Xotira juda oshib ketsa, AI ogohlantiradi
-            if (cpu > 80) {
-                this.terminal.writeLog("[WARN]: High CPU Load. Optimizing...", "yellow");
-            }
+            document.getElementById('cpuUsage').textContent = (Math.random() * 5 + 1).toFixed(1) + '%';
+            document.getElementById('memoryUsage').textContent = (Math.random() * 20 + 150).toFixed(0) + ' MB';
         }, 2000);
     }
 }
 
-// OSni ishga tushirish
-const OS = new NeuralOS();
+// OS ishga tushirish
+window.addEventListener('DOMContentLoaded', () => {
+    window.OS = new NeuralOS();
+});
