@@ -1,263 +1,111 @@
 <!DOCTYPE html>
-<html lang="uz">
+<html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>OmniScience OS | Universal Lab</title>
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    <style>
-        :root {
-            --primary: #00d2ff;
-            --secondary: #9d50bb;
-            --bg: #020617;
-            --glass: rgba(255, 255, 255, 0.03);
-            --border: rgba(255, 255, 255, 0.1);
-        }
-
-        body {
-            background: radial-gradient(circle at center, #0f172a 0%, var(--bg) 100%);
-            color: #f8fafc;
-            font-family: 'Inter', system-ui, sans-serif;
-            margin: 0;
-            overflow-x: hidden;
-        }
-
-        /* HEADER & NAVIGATION */
-        header {
-            padding: 40px;
-            text-align: center;
-            background: var(--glass);
-            backdrop-filter: blur(20px);
-            border-bottom: 1px solid var(--border);
-        }
-
-        .logo {
-            font-size: 3rem;
-            font-weight: 900;
-            background: linear-gradient(90deg, var(--primary), var(--secondary), #ff007f);
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-            letter-spacing: -2px;
-            margin: 0;
-        }
-
-        nav {
-            display: flex;
-            justify-content: center;
-            gap: 20px;
-            margin-top: 20px;
-        }
-
-        .nav-btn {
-            background: var(--glass);
-            border: 1px solid var(--border);
-            color: white;
-            padding: 12px 25px;
-            border-radius: 50px;
-            cursor: pointer;
-            transition: 0.3s;
-            display: flex;
-            align-items: center;
-            gap: 10px;
-        }
-
-        .nav-btn:hover, .nav-btn.active {
-            background: var(--primary);
-            color: black;
-            border-color: var(--primary);
-            box-shadow: 0 0 20px rgba(0, 210, 255, 0.4);
-        }
-
-        /* MAIN CONTENT AREA */
-        main {
-            padding: 40px;
-            max-width: 1400px;
-            margin: 0 auto;
-        }
-
-        .section { display: none; animation: fadeIn 0.5s ease; }
-        .section.active { display: block; }
-
-        @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
-
-        /* GLASS CARD SYSTEM */
-        .grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 30px; }
-        
-        .card {
-            background: var(--glass);
-            border: 1px solid var(--border);
-            border-radius: 30px;
-            padding: 30px;
-            backdrop-filter: blur(30px);
-            transition: 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
-        }
-
-        .card:hover { transform: translateY(-10px); border-color: var(--primary); }
-
-        .icon-header { font-size: 2.5rem; color: var(--primary); margin-bottom: 20px; }
-
-        /* CHEMISTRY LAB UI */
-        .lab-container {
-            display: grid;
-            grid-template-columns: 300px 1fr;
-            gap: 20px;
-            background: rgba(0,0,0,0.2);
-            border-radius: 30px;
-            padding: 20px;
-        }
-
-        .inventory {
-            background: var(--glass);
-            padding: 20px;
-            border-radius: 20px;
-            height: 500px;
-            overflow-y: auto;
-        }
-
-        .item {
-            display: flex;
-            align-items: center;
-            gap: 15px;
-            padding: 15px;
-            background: rgba(255,255,255,0.05);
-            margin-bottom: 10px;
-            border-radius: 15px;
-            cursor: pointer;
-            border: 1px solid transparent;
-        }
-
-        .item:hover { border-color: var(--primary); background: rgba(0, 210, 255, 0.1); }
-
-        .lab-bench {
-            background: url('https://www.transparenttextures.com/patterns/carbon-fibre.png'), #111;
-            border-radius: 20px;
-            position: relative;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            flex-direction: column;
-        }
-
-        .visual-tool { font-size: 150px; color: var(--primary); filter: drop-shadow(0 0 20px var(--primary)); }
-
-        .reaction-info {
-            position: absolute;
-            bottom: 20px;
-            background: var(--primary);
-            color: black;
-            padding: 15px 30px;
-            border-radius: 15px;
-            font-weight: bold;
-            display: none;
-        }
-
-    </style>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>OmniScience Neural OS Pro+</title>
+<link rel="stylesheet" href="styles/style.css" />
+<link rel="stylesheet"
+href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/
+all.min.css" />
+<link rel="stylesheet"
+href="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.css" />
+<script defer src="https://cdn.jsdelivr.net/npm/mathjs@12.4.1/lib/browser/
+math.js"></script>
+<script defer src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script defer src="https://cdn.jsdelivr.net/npm/gsap@3.12.5/dist/
+gsap.min.js"></script>
+<script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/
+katex.min.js"></script>
+1
+<script type="module" src="scripts/app.js"></script>
 </head>
 <body>
-
-<header>
-    <h1 class="logo">OMNISCIENCE OS</h1>
-    <nav>
-        <button class="nav-btn active" onclick="showTab('math')"><i class="fas fa-square-root-variable"></i> Matematika</button>
-        <button class="nav-btn" onclick="showTab('physics')"><i class="fas fa-atom"></i> Fizika</button>
-        <button class="nav-btn" onclick="showTab('chem')"><i class="fas fa-flask"></i> Kimyo Lab</button>
-    </nav>
-</header>
-
-<main>
-    <div id="math" class="section active">
-        <div class="grid">
-            <div class="card">
-                <i class="fas fa-infinity icon-header"></i>
-                <h3>Algebraik Formulalar</h3>
-                <p>Kvadrat tenglama: <code>ax² + bx + c = 0</code></p>
-                <p>Diskriminant: <code>D = b² - 4ac</code></p>
-            </div>
-            <div class="card">
-                <i class="fas fa-chart-line icon-header"></i>
-                <h3>Geometriya qoidalari</h3>
-                <p>Pifagor: <code>a² + b² = c²</code></p>
-                <p>Sfera hajmi: <code>V = 4/3πr³</code></p>
-            </div>
-        </div>
-    </div>
-
-    <div id="physics" class="section">
-        <div class="grid">
-            <div class="card">
-                <i class="fas fa-bolt icon-header"></i>
-                <h3>Elektrodinamika</h3>
-                <p>Om qonuni: <code>U = I · R</code></p>
-                <p>Quvvat: <code>P = U · I</code></p>
-            </div>
-            <div class="card">
-                <i class="fas fa-weight-hanging icon-header"></i>
-                <h3>Mexanika</h3>
-                <p>Nyuton 2-qonuni: <code>F = m · a</code></p>
-                <p>Energiya: <code>E = mc²</code></p>
-            </div>
-        </div>
-    </div>
-
-    <div id="chem" class="section">
-        <div class="lab-container">
-            <div class="inventory">
-                <h4>🧪 Moddalar & Asboblar</h4>
-                <div class="item" onclick="mix('Na')"><i class="fas fa-circle" style="color: silver;"></i> Natriy (Na)</div>
-                <div class="item" onclick="mix('Cl')"><i class="fas fa-biohazard" style="color: lime;"></i> Xlor (Cl)</div>
-                <div class="item" onclick="mix('H')"><i class="fas fa-wind" style="color: lightblue;"></i> Vodorod (H)</div>
-                <div class="item" onclick="mix('O')"><i class="fas fa-burn" style="color: red;"></i> Kislorod (O)</div>
-                <div class="item" onclick="resetLab()"><i class="fas fa-trash"></i> Tozalash</div>
-            </div>
-            <div class="lab-bench" id="bench">
-                <i class="fas fa-flask-vial visual-tool" id="main-icon"></i>
-                <div id="status">Elementlarni tanlang...</div>
-                <div class="reaction-info" id="result">Reaksiya natijasi: NaCl (Tuz)</div>
-            </div>
-        </div>
-    </div>
+<div id="particles"></div>
+<div class="app-shell">
+<aside class="sidebar glass">
+<div class="logo">⚛ OmniScience</div>
+<button class="nav-btn active" data-view="dashboard">
+<i class="fa-solid fa-chart-line"></i>
+ Dashboard
+</button>
+<button class="nav-btn" data-view="chemistry">
+<i class="fa-solid fa-flask"></i>
+ Chemistry
+</button>
+<button class="nav-btn" data-view="math">
+<i class="fa-solid fa-square-root-variable"></i>
+ Mathematics
+</button>
+<button class="nav-btn" data-view="physics">
+<i class="fa-solid fa-atom"></i>
+ Physics
+</button>
+<button class="nav-btn" data-view="terminal">
+<i class="fa-solid fa-terminal"></i>
+ Neural Terminal
+</button>
+</aside>
+<main class="workspace">
+<section id="dashboard" class="view active glass">
+<h1>OmniScience Neural OS Pro+</h1>
+<div class="stats-grid">
+<div class="stat-card glass">
+<h3>CPU Simulation</h3>
+<p id="cpuUsage">0%</p>
+</div>
+<div class="stat-card glass">
+<h3>Memory</h3>
+<p id="memoryUsage">0 MB</p>
+2
+</div>
+<div class="stat-card glass">
+<h3>Experiments</h3>
+<p id="expCount">0</p>
+</div>
+</div>
+</section>
+<section id="chemistry" class="view glass">
+<h2>Chemistry Laboratory</h2>
+<div class="chem-controls">
+<select id="element1"></select>
+<select id="element2"></select>
+<button id="mixBtn">Mix</button>
+<button id="heatBtn">Heat</button>
+</div>
+<div class="lab-area">
+<div class="beaker" id="beaker"></div>
+</div>
+<div id="reactionResult"></div>
+</section>
+<section id="math" class="view glass">
+<h2>Mathematics Engine</h2>
+<input id="mathInput" placeholder="x^2 - 4" />
+<button id="solveBtn">Solve</button>
+<button id="plotBtn">Plot</button>
+<div id="mathOutput"></div>
+<canvas id="chart"></canvas>
+</section>
+<section id="physics" class="view glass">
+<h2>Physics Simulation</h2>
+<input id="massInput" type="number" placeholder="Mass kg" />
+<input id="forceInput" type="number" placeholder="Force N" />
+<button id="simulatePhysics">Simulate</button>
+<div id="physicsResult"></div>
+<div class="physics-area">
+<div class="physics-object" id="physicsObject"></div>
+</div>
+</section>
+3
+<section id="terminal" class="view glass">
+<h2>Neural Terminal</h2>
+<div id="terminalOutput"></div>
+<div class="terminal-input-row">
+<span>>></span>
+<input id="terminalInput" autocomplete="off" />
+</div>
+</section>
 </main>
-
-<script>
-    function showTab(id) {
-        document.querySelectorAll('.section').forEach(s => s.classList.remove('active'));
-        document.querySelectorAll('.nav-btn').forEach(b => b.classList.remove('active'));
-        document.getElementById(id).classList.add('active');
-        event.currentTarget.classList.add('active');
-    }
-
-    let elements = [];
-    function mix(el) {
-        elements.push(el);
-        document.getElementById('status').innerText = "Aralashmada: " + elements.join(" + ");
-        
-        const result = document.getElementById('result');
-        const icon = document.getElementById('main-icon');
-
-        if(elements.includes('Na') && elements.includes('Cl')) {
-            result.style.display = 'block';
-            result.innerText = "🔥 Reaksiya: 2Na + Cl2 → 2NaCl (Osh tuzi!)";
-            icon.style.color = "#fff";
-            icon.className = "fas fa-cubes visual-tool";
-        }
-        
-        if(elements.includes('H') && elements.includes('O')) {
-            result.style.display = 'block';
-            result.innerText = "💧 Reaksiya: 2H2 + O2 → 2H2O (Suv hosil bo'ldi!)";
-            icon.style.color = "#00d2ff";
-            icon.className = "fas fa-tint visual-tool";
-        }
-    }
-
-    function resetLab() {
-        elements = [];
-        document.getElementById('status').innerText = "Elementlarni tanlang...";
-        document.getElementById('result').style.display = 'none';
-        const icon = document.getElementById('main-icon');
-        icon.className = "fas fa-flask-vial visual-tool";
-        icon.style.color = "var(--primary)";
-    }
-</script>
-
+</div>
 </body>
 </html>
