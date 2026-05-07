@@ -36,7 +36,16 @@ export class MathEngine {
             }
 
             if (this.output) {
-                this.output.innerHTML = `\n                <div class="math-card glass-card">\n                    <div class="result-header">Result: ${result}</div>\n                    <div class="step-explanation">${explanation || ''}</div>\n                </div>\n            `;
+                let resultHtml = '';
+                try {
+                    if (typeof katex !== 'undefined' && katex && katex.renderToString) {
+                        resultHtml = katex.renderToString(String(result), { throwOnError: false });
+                    } else {
+                        resultHtml = `<pre style="white-space:pre-wrap">${String(result)}</pre>`;
+                    }
+                } catch (e) { resultHtml = `<pre>${String(result)}</pre>`; }
+
+                this.output.innerHTML = `\n                <div class="math-card glass-card">\n                    <div class="result-header">Result:</div>\n                    <div class="result-body">${resultHtml}</div>\n                    <div class="step-explanation">${explanation || ''}</div>\n                </div>\n            `;
             }
 
             // persist
@@ -75,32 +84,13 @@ export class MathEngine {
      * Gemini va MathJS yordamida masalalarni yechish
      */
     async solve() {
-        const input = document.getElementById('mathInput').value;
+        const input = (document.getElementById('mathInput') || {}).value || '';
         if (!input) return;
 
         this.updateAIStatus(`Processing formula: ${input}...`);
-        
-        try {
-            // 1. MathJS yordamida tezkor hisoblash (Algebraik/Sonli)
-            const result = math.evaluate(input);
-            
-            // 2. Gemini orqali qadam-baqadam tushuntirish olish
-            const aiExplanation = await window.aiQuery(
-                `Matematik masalani qisqa qadamlarda tushuntir: ${input}. Natija: ${result}`
-            );
-
-            this.output.innerHTML = `
-                <div class="math-card glass-card">
-                    <div class="result-header">Result: ${result}</div>
-                    <div class="step-explanation">${aiExplanation}</div>
-                </div>
-            `;
-            
-            this.storage.save('last_math_result', result);
-        } catch (err) {
-            // Self-healing: Agar xato bo'lsa, Gemini'dan to'g'ri formatni so'rash
-            const fix = await window.aiQuery(`Mana bu matematik ifodadagi xatoni tuzat: ${input}. Faqat to'g'ri ifodani qaytar.`);
-            this.output.innerHTML = `<p class="error-text">Xato! Balki demoqchisiz: <b>${fix}</b></p>`;
+        const res = await this.compute(input, true);
+        if (res.error) {
+            if (this.output) this.output.innerHTML = `<p class="error-text">Error: ${res.error}${res.suggestion ? `<br>Suggestion: ${res.suggestion}` : ''}</p>`;
         }
     }
 

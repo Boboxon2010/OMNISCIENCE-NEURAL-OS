@@ -43,8 +43,11 @@ export class Terminal {
         if (lowerCmd === 'help') {
             this.writeLog(`
                 Mavjud buyruqlar:
-                - solve [ifoda]: Matematik masalani yechish
-                - chem [modda1] + [modda2]: Kimyoviy tahlil
+                - solve [ifoda]: Matematik masalani yechish (math.compute)
+                - plot [ifoda]: Grafik chizish (Math view)
+                - plotrange [ifoda] xmin xmax step: Plot with range
+                - chem [modda1] + [modda2]: Kimyoviy tahlil (chemistry.mixFromArgs)
+                - physics simulate [force] [mass]: Physics calculation (physics.simulateFromArgs)
                 - ai [savol]: Gemini bilan bevosita muloqot
                 - status: Tizim holatini tekshirish
                 - clear: Terminalni tozalash
@@ -95,6 +98,13 @@ export class Terminal {
                 } else {
                     this.writeLog('[ERR]: AI offline.', 'red');
                 }
+                return;
+            }
+
+            // Quick local fallbacks for very short messages (no AI)
+            const greetings = ['salom','assalomu alaykum','hello','hi'];
+            if (!command.includes(' ') && greetings.includes(lowerCmd)) {
+                this.writeLog('[GEMINI]: Va alaykum assalom! Qanday yordam bera olaman? (Type `help` to see commands)`', 'cyan');
                 return;
             }
 

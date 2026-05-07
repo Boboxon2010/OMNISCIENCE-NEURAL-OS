@@ -3,29 +3,14 @@
  * Powered by Gemini AI for Dynamic Chemical Reactions
  */
 
-class ChemicalElement {
-    constructor(symbol, name, mass, phase, color) {
-        this.symbol = symbol;
-        this.name = name;
-        this.mass = mass;
-        this.phase = phase;
-        this.color = color;
-    }
-}
+import { ELEMENTS } from './elements.js';
 
 export class ChemistryEngine {
     constructor(storage) {
         this.storage = storage;
         this.isHeating = false;
-        // Kengaytirilgan elementlar bazasi
-        this.elements = [
-            new ChemicalElement('Na', 'Sodium', 22.9, 'solid', '#ffd166'),
-            new ChemicalElement('H2O', 'Water', 18, 'liquid', '#00e5ff'),
-            new ChemicalElement('HCl', 'Hydrochloric Acid', 36.5, 'liquid', '#ff2f6d'),
-            new ChemicalElement('NaOH', 'Sodium Hydroxide', 40, 'solid', '#9b5cff'),
-            new ChemicalElement('K', 'Potassium', 39.1, 'solid', '#ff9ff3'),
-            new ChemicalElement('H2SO4', 'Sulfuric Acid', 98, 'liquid', '#f1c40f')
-        ];
+        // Use generated element list
+        this.elements = ELEMENTS;
     }
 
     initialize() {
@@ -44,10 +29,21 @@ export class ChemistryEngine {
         const s2 = document.getElementById('element2');
         if (!s1 || !s2) return;
 
+        // Clear existing
+        s1.innerHTML = '';
+        s2.innerHTML = '';
+
         this.elements.forEach(el => {
-            s1.add(new Option(`${el.symbol} - ${el.name}`, el.symbol));
-            s2.add(new Option(`${el.symbol} - ${el.name}`, el.symbol));
+            const label = `${el.symbol} - ${el.name}`;
+            const opt1 = new Option(label, el.symbol);
+            const opt2 = new Option(label, el.symbol);
+            s1.add(opt1);
+            s2.add(opt2);
         });
+
+        // Set default selections if possible
+        if (s1.options.length > 0) s1.selectedIndex = 0;
+        if (s2.options.length > 1) s2.selectedIndex = 1;
     }
 
     /**
@@ -83,7 +79,7 @@ export class ChemistryEngine {
             const aiPrompt = `Kimyo reaksiyasini tahlil qil: ${e1} va ${e2} aralashsa nima bo'ladi? 
                              Faqat qisqa formula va natijani yoz. Portlash bo'lsa "EXPLOSION" so'zini qo'sh.`;
             
-            const aiResponse = await window.aiQuery(aiPrompt);
+            const aiResponse = (typeof window.aiQuery === 'function') ? await window.aiQuery(aiPrompt) : 'Neural link offline.';
             resultDiv.innerHTML = `<div class="ai-res"><strong>AI Tahlili:</strong> ${aiResponse}</div>`;
             
             if (aiResponse.includes("EXPLOSION")) {
@@ -96,6 +92,17 @@ export class ChemistryEngine {
             // Update dashboard counter if present
             const expEl = document.getElementById('expCount');
             if (expEl) expEl.textContent = String(prev + 1);
+            // Visual: color the liquid based on selected elements
+            try {
+                const elObj1 = this.elements.find(x => x.symbol === e1) || null;
+                const elObj2 = this.elements.find(x => x.symbol === e2) || null;
+                if (liquid) {
+                    const c1 = elObj1 ? elObj1.color : 'rgba(0,242,255,0.6)';
+                    const c2 = elObj2 ? elObj2.color : 'rgba(188,19,254,0.6)';
+                    liquid.style.background = `linear-gradient(45deg, ${c1}, ${c2})`;
+                }
+            } catch {}
+
             // Play mix sound if available
             try { if (window.OS && window.OS.audio) window.OS.audio.play('mix', { volume: 0.6 }); } catch {}
         } catch (err) {

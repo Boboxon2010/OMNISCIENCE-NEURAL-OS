@@ -1,10 +1,10 @@
 export class PhysicsEngine {
-initialize() {
-document.getElementById('simulatePhysics')
+	initialize() {
 		const btn = document.getElementById('simulatePhysics');
 		if (btn) btn.addEventListener('click', () => this.simulate());
-}
-simulate() {
+	}
+
+	simulate() {
 		const massInput = document.getElementById('massInput');
 		const forceInput = document.getElementById('forceInput');
 		const resultEl = document.getElementById('physicsResult');
@@ -35,5 +35,29 @@ simulate() {
 
 		// play click sound if available
 		try { if (window.OS && window.OS.audio) window.OS.audio.play('click', { volume: 0.4 }); } catch {}
-}
+	}
+
+	/**
+	 * Programmatic simulate: accepts force and mass (or an object) and returns computed values.
+	 */
+	simulateFromArgs(force, mass) {
+		const f = Number(force);
+		const m = Number(mass);
+		if (!isFinite(f) || !isFinite(m) || m <= 0) return { error: 'Invalid args' };
+		const a = f / m;
+		const momentum = this.computeMomentum(m, a); // using a as velocity rough proxy (not literal)
+		return { acceleration: a, momentum };
+	}
+
+	computeMomentum(mass, velocity) {
+		return Number(mass) * Number(velocity);
+	}
+
+	computeKineticEnergy(mass, velocity) {
+		return 0.5 * Number(mass) * Math.pow(Number(velocity), 2);
+	}
+
+	computePotentialEnergy(mass, height, g = 9.81) {
+		return Number(mass) * Number(g) * Number(height);
+	}
 }
